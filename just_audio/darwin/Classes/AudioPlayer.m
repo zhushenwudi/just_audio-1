@@ -20,6 +20,8 @@ typedef struct JATapStorage {
     void *fft;
 } JATapStorage;
 
+#define TREADMILL_SIZE 2
+
 // TODO: Check for and report invalid state transitions.
 // TODO: Apply Apple's guidance on seeking: https://developer.apple.com/library/archive/qa/qa1820/_index.html
 @implementation AudioPlayer {
@@ -62,6 +64,7 @@ typedef struct JATapStorage {
     int _visualizerCaptureRate;
     int _visualizerCaptureSize;
     int _visualizerSamplingRate;
+    BOOL _enqueuedAll;
     NSDictionary<NSString *, NSObject *> *_icyMetadata;
 }
 
@@ -131,6 +134,7 @@ typedef struct JATapStorage {
     _visualizerCaptureRate = 0;
     _visualizerCaptureSize = 0;
     _visualizerSamplingRate = 0;
+    _enqueuedAll = NO;
     _icyMetadata = @{};
     __weak __typeof__(self) weakSelf = self;
     [_methodChannel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
@@ -659,7 +663,8 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
     } else if ([@"concatenating" isEqualToString:type]) {
         return [[ConcatenatingAudioSource alloc] initWithId:data[@"id"]
                                                audioSources:[self decodeAudioSources:data[@"children"]]
-                                               shuffleOrder:(NSArray<NSNumber *> *)data[@"shuffleOrder"]];
+                                               shuffleOrder:(NSArray<NSNumber *> *)data[@"shuffleOrder"]
+                                                lazyLoading:(NSNumber *)data[@"useLazyPreparation"]];
     } else if ([@"clipping" isEqualToString:type]) {
         return [[ClippingAudioSource alloc] initWithId:data[@"id"]
                                            audioSource:(UriAudioSource *)[self decodeAudioSource:data[@"child"]]
@@ -717,12 +722,19 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
     /* [self dumpQueue]; */
 
     // Regenerate queue
+    _enqueuedAll = NO;
     if (!existingItem || _loopMode != loopOne) {
+        _enqueuedAll = YES;
         BOOL include = NO;
         for (int i = 0; i < [_order count]; i++) {
             int si = [_order[i] intValue];
             if (si == _index) include = YES;
             if (include && _indexedAudioSources[si].playerItem != existingItem) {
+                if (_indexedAudioSources[si].lazyLoading && _player.items.count >= TREADMILL_SIZE) {
+                    // Enqueue up until the first lazy item that does not fit on the treadmill.
+                    _enqueuedAll = NO;
+                    break;
+                }
                 //NSLog(@"inserting item %d", si);
                 [_player insertItem:_indexedAudioSources[si].playerItem afterItem:nil];
                 if (_loopMode == loopOne) {
@@ -735,7 +747,7 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
 
     // Add next loop item if we're looping
     if (_order.count > 0) {
-        if (_loopMode == loopAll) {
+        if (_loopMode == loopAll && _enqueuedAll) {
             int si = [_order[0] intValue];
             //NSLog(@"### add loop item:%d", si);
             if (!_indexedAudioSources[si].playerItem2) {
@@ -1147,9 +1159,13 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
                 if (_index == [_order[0] intValue] && playerItem == audioSource.playerItem2) {
                     [audioSource flip];
                     [self enqueueFrom:_index];
+                } else if (!_enqueuedAll) {
+                    [self enqueueFrom:_index];
                 } else {
                     [self updateEndAction];
                 }
+            } else if (!_enqueuedAll) {
+                [self enqueueFrom:_index];
             }
             _justAdvanced = NO;
         }
@@ -1167,7 +1183,7 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
 - (void)sendErrorForItem:(IndexedPlayerItem *)playerItem {
     FlutterError *flutterError = [FlutterError errorWithCode:[NSString stringWithFormat:@"%d", (int)playerItem.error.code]
                                                      message:playerItem.error.localizedDescription
-                                                     details:nil];
+                                                     details:@{@"index": @([self indexForItem:playerItem])}];
     [self sendError:flutterError playerItem:playerItem];
 }
 
@@ -1456,6 +1472,7 @@ static void finalizeTap(MTAudioProcessingTapRef tap) {
                         _player.rate = _speed;
                     }
                 }
+                [self broadcastPlaybackEvent];
                 completionHandler(YES);
             }
         }
