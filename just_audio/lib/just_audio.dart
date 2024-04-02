@@ -673,7 +673,7 @@ class AudioPlayer {
   /// This is equivalent to:
   ///
   /// ```
-  /// setAudioSource(AudioSource.uri(Uri.parse(url), headers: headers),
+  /// setAudioSource(AudioSource.uri(Uri.parse(url), headers: headers, tag: tag),
   ///     initialPosition: Duration.zero, preload: true);
   /// ```
   ///
@@ -683,9 +683,12 @@ class AudioPlayer {
     Map<String, String>? headers,
     Duration? initialPosition,
     bool preload = true,
+    dynamic tag,
   }) =>
-      setAudioSource(AudioSource.uri(Uri.parse(url), headers: headers),
-          initialPosition: initialPosition, preload: preload);
+      setAudioSource(
+          AudioSource.uri(Uri.parse(url), headers: headers, tag: tag),
+          initialPosition: initialPosition,
+          preload: preload);
 
   /// Convenience method to set the audio source to a file, preloaded by
   /// default, with an initial position of zero by default.
@@ -693,7 +696,7 @@ class AudioPlayer {
   /// This is equivalent to:
   ///
   /// ```
-  /// setAudioSource(AudioSource.uri(Uri.file(filePath)),
+  /// setAudioSource(AudioSource.uri(Uri.file(filePath), tag: tag),
   ///     initialPosition: Duration.zero, preload: true);
   /// ```
   ///
@@ -702,8 +705,9 @@ class AudioPlayer {
     String filePath, {
     Duration? initialPosition,
     bool preload = true,
+    dynamic tag,
   }) =>
-      setAudioSource(AudioSource.file(filePath),
+      setAudioSource(AudioSource.file(filePath, tag: tag),
           initialPosition: initialPosition, preload: preload);
 
   /// Convenience method to set the audio source to an asset, preloaded by
@@ -712,7 +716,7 @@ class AudioPlayer {
   /// For assets within the same package, this is equivalent to:
   ///
   /// ```
-  /// setAudioSource(AudioSource.uri(Uri.parse('asset:///$assetPath')),
+  /// setAudioSource(AudioSource.uri(Uri.parse('asset:///$assetPath'), tag: tag),
   ///     initialPosition: Duration.zero, preload: true);
   /// ```
   ///
@@ -725,9 +729,10 @@ class AudioPlayer {
     String? package,
     bool preload = true,
     Duration? initialPosition,
+    dynamic tag,
   }) =>
       setAudioSource(
-        AudioSource.asset(assetPath, package: package),
+        AudioSource.asset(assetPath, package: package, tag: tag),
         initialPosition: initialPosition,
         preload: preload,
       );
@@ -753,6 +758,8 @@ class AudioPlayer {
   /// * [PlayerInterruptedException] if another audio source was loaded before
   /// this call completed or the player was stopped or disposed of before the
   /// call completed.
+  ///
+  /// See [AudioSource] for a detailed explanation of the AudioSource object.
   Future<Duration?> setAudioSource(
     AudioSource source, {
     bool preload = true,
@@ -2169,6 +2176,11 @@ abstract class AudioSource {
   /// automatically detect the stream type. On Android, the type of stream will
   /// be guessed from the extension.
   ///
+  /// The tag is for associating your app's own data with each audio source.
+  /// When using just_audio_background,because then it has to be a MediaItem,
+  /// a class provided by this package. If you want to manage this tag object by yourself,
+  /// consider using the plugin audio_service instead.
+  ///
   /// If you are loading DASH or HLS streams that do not have standard "mpd" or
   /// "m3u8" extensions in their URIs, this method will fail to detect the
   /// stream type on Android. If you know in advance what type of audio stream
@@ -2196,7 +2208,7 @@ abstract class AudioSource {
   /// This is equivalent to:
   ///
   /// ```
-  /// AudioSource.uri(Uri.file(filePath));
+  /// AudioSource.uri(Uri.file(filePath), tag: tag);
   /// ```
   static UriAudioSource file(String filePath, {dynamic tag}) {
     return AudioSource.uri(Uri.file(filePath), tag: tag);
@@ -2207,7 +2219,7 @@ abstract class AudioSource {
   /// For assets within the same package, this is equivalent to:
   ///
   /// ```
-  /// AudioSource.uri(Uri.parse('asset:///$assetPath'));
+  /// AudioSource.uri(Uri.parse('asset:///$assetPath'), tag: tag);
   /// ```
   ///
   /// If the asset is to be loaded from a different package, the [package]
