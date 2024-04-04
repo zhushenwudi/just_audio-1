@@ -2177,7 +2177,7 @@ abstract class AudioSource {
   /// be guessed from the extension.
   ///
   /// The tag is for associating your app's own data with each audio source.
-  /// When using just_audio_background,because then it has to be a MediaItem,
+  /// When using just_audio_background, it has to be a MediaItem,
   /// a class provided by this package. If you want to manage this tag object by yourself,
   /// consider using the plugin audio_service instead.
   ///
