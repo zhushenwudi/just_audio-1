@@ -15,7 +15,6 @@ public class BetterVisualizer {
     private boolean enableWaveform;
     private boolean enableFft;
     private boolean pendingStartRequest;
-    private boolean hasPermission;
 
     public BetterVisualizer(final BinaryMessenger messenger, String id) {
         waveformEventChannel = new BetterEventChannel(messenger, "com.ryanheise.just_audio.waveform_events." + id);
@@ -26,20 +25,9 @@ public class BetterVisualizer {
         return visualizer.getSamplingRate();
     }
 
-    public void setHasPermission(boolean hasPermission) {
-        this.hasPermission = hasPermission;
-        if (audioSessionId != null && hasPermission && pendingStartRequest) {
-            start(captureRate, captureSize, enableWaveform, enableFft);
-        }
-    }
-
-    public boolean hasPermission() {
-        return hasPermission;
-    }
-
     public void onAudioSessionId(Integer audioSessionId) {
         this.audioSessionId = audioSessionId;
-        if (audioSessionId != null && hasPermission && pendingStartRequest) {
+        if (audioSessionId != null && pendingStartRequest) {
             start(captureRate, captureSize, enableWaveform, enableFft);
         }
     }
@@ -61,7 +49,7 @@ public class BetterVisualizer {
         this.enableWaveform = enableWaveform;
         this.enableFft = enableFft;
         this.captureRate = captureRate;
-        if (audioSessionId == null || !hasPermission) {
+        if (audioSessionId == null) {
             pendingStartRequest = true;
             return;
         }

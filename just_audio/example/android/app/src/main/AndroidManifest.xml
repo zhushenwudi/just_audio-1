@@ -2,6 +2,7 @@
     package="com.ryanheise.just_audio_example">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Add this to use the visualizer -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that

@@ -52,13 +52,11 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import io.flutter.Log;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class AudioPlayer implements MethodCallHandler, Player.Listener, MetadataOutput, PluginRegistry.RequestPermissionsResultListener {
+public class AudioPlayer implements MethodCallHandler, Player.Listener, MetadataOutput {
 
     static final String TAG = "AudioPlayer";
 
@@ -78,7 +76,6 @@ public class AudioPlayer implements MethodCallHandler, Player.Listener, Metadata
     private final MethodChannel methodChannel;
     private final BetterEventChannel eventChannel;
     private final BetterEventChannel dataEventChannel;
-    private ActivityPluginBinding activityPluginBinding;
 
     private ProcessingState processingState;
     private long updatePosition;
@@ -96,7 +93,6 @@ public class AudioPlayer implements MethodCallHandler, Player.Listener, Metadata
     private int errorCount;
     private AudioAttributes pendingAudioAttributes;
     private BetterVisualizer visualizer;
-    private Result startVisualizerResult;
     private boolean enableWaveform;
     private boolean enableFft;
     private Integer visualizerCaptureRate;
@@ -193,45 +189,9 @@ public class AudioPlayer implements MethodCallHandler, Player.Listener, Metadata
         }
     }
 
-    private void requestPermissions() {
-        ActivityCompat.requestPermissions(activityPluginBinding.getActivity(), new String[] { Manifest.permission.RECORD_AUDIO }, 1);
-    }
-
-    public void setActivityPluginBinding(ActivityPluginBinding activityPluginBinding) {
-        if (this.activityPluginBinding != null && this.activityPluginBinding != activityPluginBinding) {
-            this.activityPluginBinding.removeRequestPermissionsResultListener(this);
-        }
-        this.activityPluginBinding = activityPluginBinding;
-        if (activityPluginBinding != null) {
-            activityPluginBinding.addRequestPermissionsResultListener(this);
-            // If there is a pending startVisualizer request
-            if (startVisualizerResult != null) {
-                requestPermissions();
-            }
-        }
-    }
-
     private void startWatchingBuffer() {
         handler.removeCallbacks(bufferWatcher);
         handler.post(bufferWatcher);
-    }
-
-    @Override
-    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        for (int i = 0; i < permissions.length; i++) {
-            if (permissions[i].equals(Manifest.permission.RECORD_AUDIO)) {
-                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    visualizer.setHasPermission(true);
-                    if (startVisualizerResult != null) {
-                        completeStartVisualizer(true);
-                    }
-                    return true;
-                }
-                completeStartVisualizer(false);
-                break;
-            }
-        }
-        return false;
     }
 
     private void setAudioSessionId(int audioSessionId) {
@@ -459,17 +419,6 @@ public class AudioPlayer implements MethodCallHandler, Player.Listener, Metadata
         seekResult = null;
     }
 
-    private void completeStartVisualizer(boolean success) {
-        if (startVisualizerResult == null) return;
-        if (success) {
-            visualizer.start(visualizerCaptureRate, visualizerCaptureSize, enableWaveform, enableFft);
-            startVisualizerResult.success(new HashMap<String, Object>());
-        } else {
-            startVisualizerResult.error("RECORD_AUDIO permission denied", null, null);
-        }
-        startVisualizerResult = null;
-    }
-
     @Override
     public void onMethodCall(final MethodCall call, final Result result) {
         ensurePlayerInitialized();
@@ -485,19 +434,12 @@ public class AudioPlayer implements MethodCallHandler, Player.Listener, Metadata
                 this.enableFft = enableFft;
                 visualizerCaptureRate = captureRate;
                 visualizerCaptureSize = captureSize;
-                startVisualizerResult = result;
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    // We have permission
-                    visualizer.setHasPermission(true);
-                    if (audioSessionId != null) {
-                        completeStartVisualizer(true);
-                    }
-                } else if (activityPluginBinding != null && activityPluginBinding.getActivity() != null) {
-                    // We are ready to request permission
-                    requestPermissions();
-                } else {
-                    // Will request permission in setActivityPluginBinding
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    result.error("Error: RECORD_AUDIO permission required", null, null);
+                    return;
                 }
+                visualizer.start(visualizerCaptureRate, visualizerCaptureSize, enableWaveform, enableFft);
+                result.success(new HashMap<String, Object>());
                 break;
             case "stopVisualizer":
                 visualizer.stop();

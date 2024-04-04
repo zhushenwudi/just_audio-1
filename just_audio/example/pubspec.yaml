@@ -16,6 +16,7 @@ dependencies:
   # just_audio_libwinmedia: ^0.0.4
   just_audio:
     path: ../
+  permission_handler: ^11.3.1
 
 # Uncomment when testing platform interface changes.
 dependency_overrides:

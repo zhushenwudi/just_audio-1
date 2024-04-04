@@ -4,6 +4,7 @@
 //
 // flutter run -t lib/example_visualizer.dart
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_example/common.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/rxdart.dart';
 
 void main() => runApp(const MyApp());
@@ -151,6 +153,19 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   );
                 },
               ),
+              if (!kIsWeb && Platform.isAndroid)
+                ElevatedButton(
+                  child: const Text('Request permission'),
+                  onPressed: () async {
+                    final status = await Permission.microphone.request();
+                    print('Permission granted: ${status.isGranted}');
+                    if (status.isGranted && _player.playing) {
+                      // If we already started playing without the visualizer,
+                      // start the visualizer.
+                      await _player.startVisualizer();
+                    }
+                  },
+                ),
             ],
           ),
         ),

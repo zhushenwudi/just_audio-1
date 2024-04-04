@@ -279,6 +279,18 @@ dependencies {
 }
 ```
 
+To use the visualizer, add the following permission to your `AndroidManifest.xml` file:
+
+```xml
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+```
+
+You will also need to request this permission from the user at runtime. You can achieve this with [permission_handler](https://pub.dev/packages/permission_handler) via the following code:
+
+```dart
+if (Platform.isAndroid && (await Permission.microphone.request()).isGranted) { ... }
+```
+
 ### iOS
 
 Using the default configuration, the App Store will detect that your app uses the AVAudioSession API which includes a microphone API, and for privacy reasons it will ask you to describe your app's usage of the microphone. If your app does indeed use the microphone, you can describe your usage by editing the `Info.plist` file as follows:
@@ -455,15 +467,14 @@ Please also consider pressing the thumbs up button at the top of [this page](htt
 | skip silence                   | ✅      |     |       |     |         |       |
 | equalizer                      | ✅      |     |       |     |         | ✅    |
 | volume boost                   | ✅      |     |       |     |         | ✅    |
+| Waveform/FFT visualizer        | ✅      | ✅  |       |     |         |       |
 
 ## Experimental features
 
-| Feature                                                                            | Android   | iOS     | macOS   | Web     |
-| -------                                                                            | :-------: | :-----: | :-----: | :-----: |
-| Simultaneous downloading+caching                                                   | ✅        | ✅      | ✅      |         |
-| Waveform visualizer (See [#97](https://github.com/ryanheise/just_audio/issues/97)) | ✅        | ✅      |         |         |
-| FFT visualizer (See [#97](https://github.com/ryanheise/just_audio/issues/97))      | ✅        | ✅      | ✅      |         |
-| Background                                                                         | ✅        | ✅      | ✅      | ✅      |
+| Feature                          | Android   | iOS     | macOS   | Web     | Windows | Linux |
+| -------                          | :-------: | :-----: | :-----: | :-----: | :-----: | :---: |
+| Simultaneous downloading+caching | ✅        | ✅      | ✅      |         | ✅      | ✅    |
+| Background                       | ✅        | ✅      | ✅      | ✅      |         |       |
 
 Please consider reporting any bugs you encounter [here](https://github.com/ryanheise/just_audio/issues) or submitting pull requests [here](https://github.com/ryanheise/just_audio/pulls).
 
