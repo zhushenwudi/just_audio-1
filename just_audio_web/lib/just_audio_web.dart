@@ -328,6 +328,21 @@ class Html5AudioPlayer extends JustAudioPlayer {
     return SetShuffleOrderResponse();
   }
 
+  Future<SetCrossOriginResponse> setCrossOrigin(
+      SetCrossOriginRequest request) async {
+    switch (request.crossOrigin) {
+      case CrossOriginMessage.anonymous:
+        _audioElement.crossOrigin = 'anonymous';
+        break;
+      case CrossOriginMessage.useCredentials:
+        _audioElement.crossOrigin = 'use-credentials';
+        break;
+      default:
+        throw Exception("Unknown CrossOriginMessage: $request.crossOrigin");
+    }
+    return SetCrossOriginResponse();
+  }
+
   @override
   Future<SeekResponse> seek(SeekRequest request) async {
     await _seek(request.position?.inMilliseconds ?? 0, request.index);
@@ -974,3 +989,16 @@ class _PlayPauseQueue {
     }
   }
 }
+
+class SetCrossOriginRequest {
+  final CrossOriginMessage crossOrigin;
+
+  SetCrossOriginRequest({required this.crossOrigin});
+}
+
+class SetCrossOriginResponse {
+  static SetCrossOriginResponse fromMap(Map<dynamic, dynamic> map) =>
+      SetCrossOriginResponse();
+}
+
+enum CrossOriginMessage { anonymous, useCredentials }
