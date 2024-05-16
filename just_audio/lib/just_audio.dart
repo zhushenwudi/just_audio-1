@@ -1196,6 +1196,18 @@ class AudioPlayer {
         usage: audioAttributes.usage.value));
   }
 
+  Future<void> setWebCrossOrigin(bool useCredentials) async {
+    if (_disposed) return;
+    if (!kIsWeb && !_isUnitTest()) return;
+    final WebCrossOriginMessage crossOriginMsg = useCredentials
+        ? WebCrossOriginMessage.useCredentials
+        : WebCrossOriginMessage.anonymous;
+
+    await (await _platform).webSetCrossOrigin(
+      WebSetCrossOriginRequest(crossOrigin: crossOriginMsg),
+    );
+  }
+
   /// Release all resources associated with this player. You must invoke this
   /// after you are done with the player.
   Future<void> dispose() async {
