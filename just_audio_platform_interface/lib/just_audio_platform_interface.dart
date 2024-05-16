@@ -230,6 +230,12 @@ abstract class AudioPlayerPlatform {
     throw UnimplementedError(
         "androidEqualizerBandSetGain() has not been implemented.");
   }
+
+  /// Sets the 'crossOrigin' attribute on the web audio element.
+  Future<WebSetCrossOriginResponse> webSetCrossOrigin(
+      WebSetCrossOriginRequest request) {
+    throw UnimplementedError("webSetCrossOrigin() has not been implemented.");
+  }
 }
 
 /// A data update communicated from the platform implementation to the Flutter
@@ -1485,3 +1491,16 @@ class AndroidEqualizerMessage extends AudioEffectMessage {
         'parameters': parameters?.toMap(),
       };
 }
+
+class WebSetCrossOriginRequest {
+  final WebCrossOriginMessage crossOrigin;
+
+  WebSetCrossOriginRequest({required this.crossOrigin});
+}
+
+class WebSetCrossOriginResponse {
+  static WebSetCrossOriginResponse fromMap(Map<dynamic, dynamic> map) =>
+      WebSetCrossOriginResponse();
+}
+
+enum WebCrossOriginMessage { anonymous, useCredentials }
