@@ -1,6 +1,6 @@
 ## 0.4.11
 
-* Allow to set `crossorigin` on the HTML `<audio />` element (see [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin))
+* Allow to set `crossorigin` on the HTML `<audio />` element (see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/crossOrigin))
 
 ## 0.4.10
 
