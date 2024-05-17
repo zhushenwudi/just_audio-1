@@ -232,9 +232,9 @@ abstract class AudioPlayerPlatform {
   }
 
   /// Sets the 'crossOrigin' attribute on the web audio element.
-  Future<WebSetCrossOriginResponse> webSetCrossOrigin(
-      WebSetCrossOriginRequest request) {
-    throw UnimplementedError("webSetCrossOrigin() has not been implemented.");
+  Future<SetWebCrossOriginResponse> setWebCrossOrigin(
+      SetWebCrossOriginRequest request) {
+    throw UnimplementedError("setWebCrossOrigin() has not been implemented.");
   }
 }
 
@@ -1492,15 +1492,12 @@ class AndroidEqualizerMessage extends AudioEffectMessage {
       };
 }
 
-class WebSetCrossOriginRequest {
-  final WebCrossOriginMessage crossOrigin;
+class SetWebCrossOriginRequest {
+  final WebCrossOriginMessage? crossOrigin;
 
-  WebSetCrossOriginRequest({required this.crossOrigin});
+  SetWebCrossOriginRequest({required this.crossOrigin});
 }
 
-class WebSetCrossOriginResponse {
-  static WebSetCrossOriginResponse fromMap(Map<dynamic, dynamic> map) =>
-      WebSetCrossOriginResponse();
-}
+class SetWebCrossOriginResponse {}
 
 enum WebCrossOriginMessage { anonymous, useCredentials }

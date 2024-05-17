@@ -436,7 +436,7 @@ Please also consider pressing the thumbs up button at the top of [this page](htt
 | read from file                 | ✅      | ✅  | ✅    | ✅  | ✅      | ✅    |
 | read from asset                | ✅      | ✅  | ✅    | ✅  | ✅      | ✅    |
 | read from byte stream          | ✅      | ✅  | ✅    | ✅  | ✅      | ✅    |
-| request headers                | ✅      | ✅  | ✅    | [^1] | ✅     | ✅    |
+| request headers                | ✅      | ✅  | ✅    | *   | ✅      | ✅    |
 | DASH                           | ✅      |     |       |     | ✅      | ✅    |
 | HLS                            | ✅      | ✅  | ✅    |     | ✅      | ✅    |
 | ICY metadata                   | ✅      | ✅  | ✅    |     |         |       |
@@ -456,8 +456,7 @@ Please also consider pressing the thumbs up button at the top of [this page](htt
 | equalizer                      | ✅      |     |       |     |         | ✅    |
 | volume boost                   | ✅      |     |       |     |         | ✅    |
 
-[^1]: While headers cannot be set directly, cookies can be used to send information in the [Cookie header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie).
-See also `setWebCrossOrigin` to send cookies when loading audio files from a different origin (see [HTMLMediaElement crossOrigin](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/crossOrigin)).
+(*): While request headers cannot be set directly on Web, cookies can be used to send information in the [Cookie header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie). See also `AudioPlayer.setWebCrossOrigin` to allow sending cookies when loading audio files from the same origin or a different origin.
 
 
 ## Experimental features

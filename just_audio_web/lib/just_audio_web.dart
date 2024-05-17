@@ -350,19 +350,13 @@ class Html5AudioPlayer extends JustAudioPlayer {
   }
 
   @override
-  Future<WebSetCrossOriginResponse> webSetCrossOrigin(
-      WebSetCrossOriginRequest request) async {
-    switch (request.crossOrigin) {
-      case WebCrossOriginMessage.anonymous:
-        _audioElement.crossOrigin = 'anonymous';
-        break;
-      case WebCrossOriginMessage.useCredentials:
-        _audioElement.crossOrigin = 'use-credentials';
-        break;
-      default:
-        throw Exception("Unknown CrossOriginMessage: $request.crossOrigin");
-    }
-    return WebSetCrossOriginResponse();
+  Future<SetWebCrossOriginResponse> setWebCrossOrigin(
+      SetWebCrossOriginRequest request) async {
+    _audioElement.crossOrigin = const {
+      WebCrossOriginMessage.anonymous: 'anonymous',
+      WebCrossOriginMessage.useCredentials: 'use-credentials',
+    }[request.crossOrigin];
+    return SetWebCrossOriginResponse();
   }
 
   @override
