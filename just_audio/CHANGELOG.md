@@ -2,6 +2,11 @@
 
 * 
 
+## 0.9.38
+
+* Migrate to package:web.
+* Add AudioPlayer.setWebCrossOrigin for CORS on web (@danielwinkler).
+
 ## 0.9.37
 
 * Support useLazyPreparation on iOS/macOS.
