@@ -759,8 +759,6 @@ class AudioPlayer {
   /// * [PlayerInterruptedException] if another audio source was loaded before
   /// this call completed or the player was stopped or disposed of before the
   /// call completed.
-  ///
-  /// See [AudioSource] for a detailed explanation of the AudioSource object.
   Future<Duration?> setAudioSource(
     AudioSource source, {
     bool preload = true,
@@ -2205,11 +2203,6 @@ abstract class AudioSource {
   /// automatically detect the stream type. On Android, the type of stream will
   /// be guessed from the extension.
   ///
-  /// The tag is for associating your app's own data with each audio source.
-  /// When using just_audio_background, it has to be a MediaItem,
-  /// a class provided by this package. If you want to manage this tag object by yourself,
-  /// consider using the plugin audio_service instead.
-  ///
   /// If you are loading DASH or HLS streams that do not have standard "mpd" or
   /// "m3u8" extensions in their URIs, this method will fail to detect the
   /// stream type on Android. If you know in advance what type of audio stream
@@ -2218,6 +2211,15 @@ abstract class AudioSource {
   ///
   /// If headers are set, just_audio will create a cleartext local HTTP proxy on
   /// your device to forward HTTP requests with headers included.
+  ///
+  /// The [tag] is for associating your app's own data with each audio source,
+  /// e.g. title, cover art, a primary key for your DB. Such data can be
+  /// conveniently retrieved from the tag while rendering the UI.
+  ///
+  /// When using just_audio_background, [tag] must be a MediaItem, a class
+  /// provided by that package. If you wish to have more control over the tag
+  /// for background audio purposes, consider using the plugin audio_service
+  /// instead of just_audio_background.
   static UriAudioSource uri(Uri uri,
       {Map<String, String>? headers, dynamic tag}) {
     bool hasExtension(Uri uri, String extension) =>
