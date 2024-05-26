@@ -889,7 +889,8 @@ class AudioPlayer {
   /// original [AudioSource]. If [end] is null, it will be reset to the end of
   /// the original [AudioSource]. This method cannot be called from the
   /// [ProcessingState.idle] state.
-  Future<Duration?> setClip({Duration? start, Duration? end, dynamic tag}) async {
+  Future<Duration?> setClip(
+      {Duration? start, Duration? end, dynamic tag}) async {
     if (_disposed) return null;
     _setPlatformActive(true)?.catchError((dynamic e) async => null);
     final duration = await _load(
@@ -900,7 +901,7 @@ class AudioPlayer {
                 child: _audioSource as UriAudioSource,
                 start: start,
                 end: end,
-                tag: tag
+                tag: tag,
               ));
     return duration;
   }
