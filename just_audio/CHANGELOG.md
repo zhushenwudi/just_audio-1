@@ -1,3 +1,7 @@
+## 0.9.39
+
+* Apply preferPreciseDurationAndTiming to files (@canxin121).
+
 ## 0.9.38
 
 * Migrate to package:web.
