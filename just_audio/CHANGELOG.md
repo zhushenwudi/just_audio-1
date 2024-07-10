@@ -3,6 +3,7 @@
 * Apply preferPreciseDurationAndTiming to files (@canxin121).
 * Add tag parameter to setUrl/setFilePath/setAsset (@mathisfouques).
 * Add tag parameter to setClip (@goviral-ma).
+* Support rxdart 0.28.x.
 
 ## 0.9.38
 
