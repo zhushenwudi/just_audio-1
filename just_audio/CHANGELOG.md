@@ -2,6 +2,10 @@
 
 * Fix conversion between milliBel and deciBel (@Chaphasilor).
 
+## 0.9.40
+
+* Fix JDK 21 compile error.
+
 ## 0.9.39
 
 * Apply preferPreciseDurationAndTiming to files (@canxin121).
