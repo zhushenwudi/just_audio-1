@@ -1,3 +1,7 @@
+## 0.4.12
+
+* Bump package:web version to `>=0.5.1 <2.0.0` (@ali2236)
+
 ## 0.4.11
 
 * Bump package:web upper bound to <0.6.0
