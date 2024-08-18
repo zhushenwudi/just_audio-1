@@ -1,10 +1,7 @@
-## 0.9.41
-
-* Bump package:web version to `>=0.5.1 <2.0.0`(@ali2236) 
-
 ## 0.9.40
 
 * Fix JDK 21 compile error.
+* Bump package:web version to `>=0.5.1 <2.0.0`(@ali2236) 
 
 ## 0.9.39
 

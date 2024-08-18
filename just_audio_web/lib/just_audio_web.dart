@@ -690,7 +690,7 @@ abstract class UriAudioSourcePlayer extends IndexedAudioSourcePlayer {
   @override
   Duration get position {
     if (_initialPos != null) return Duration(milliseconds: _initialPos!);
-    final seconds = _audioElement.currentTime as double;
+    final seconds = _audioElement.currentTime;
     return Duration(milliseconds: (seconds * 1000).toInt());
   }
 
@@ -894,7 +894,7 @@ class ClippingAudioSourcePlayer extends IndexedAudioSourcePlayer {
   @override
   Duration get position {
     if (_initialPos != null) return Duration(milliseconds: _initialPos!);
-    final seconds = _audioElement.currentTime as double;
+    final seconds = _audioElement.currentTime;
     var position = Duration(milliseconds: (seconds * 1000).toInt());
     position -= effectiveStart;
     if (position < Duration.zero) {
